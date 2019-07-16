@@ -1,1 +1,4 @@
 node_modules/
+dist/
+dist/middleware/index.js
+dist/middleware/index.js.map
