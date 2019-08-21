@@ -6,6 +6,9 @@ import middleware from "./middleware";
 import errorHandlers from "./middleware/errorHandlers";
 import routes from "./services";
 
+import getDb, { connectDb } from './db/index';
+import { User } from "./db/models/user";
+
 process.on("uncaughtException", e => {
   console.log(e);
   process.exit(1);
@@ -24,6 +27,20 @@ applyMiddleware(errorHandlers, router);
 const { PORT = 3000 } = process.env;
 const server = http.createServer(router);
 
-server.listen(PORT, () =>
+server.listen(PORT, async () => {
   console.log(`Server is running http://localhost:${PORT}...`)
-);
+
+  // Connect database
+  await connectDb();
+
+  var user = User.fromBasic("Romuald DANSOU", 45);
+  user.role = {
+    name: 'admin',
+    date: new Date()
+  }
+  const db = getDb();
+  if (db) {
+    // const inserted = await user.insert<User>(db);
+    // console.log(inserted);
+  }
+});
