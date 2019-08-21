@@ -1,7 +1,8 @@
-import { PATH_METADATA, METHOD_METADATA, ROUTE_METADATA, MIDDLEWARE_METADATA } from './constant';
+import { PATH_METADATA, METHOD_METADATA, ROUTE_METADATA, MIDDLEWARE_METADATA, QUERY_METADATA } from './constant';
 import { RequestMethod } from './request-method';
 import { RequestType } from './request-type';
 import { Route } from '../../utils/route-type';
+import { checkSearchParams } from '../../middleware/checks';
 
 const defaultMetadata = {
   [PATH_METADATA]: '/',
@@ -49,6 +50,10 @@ export const createMappingDecorator = (method: RequestMethod) => (
       middlewares = [mdls];
     } else {
       middlewares = mdls;
+    }
+    if (request.query) {
+      Reflect.defineMetadata(QUERY_METADATA, request.query, checkSearchParams)
+      middlewares.push(checkSearchParams)
     }
   }
   return RequestMapping({

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { getPlacesByName } from "./SearchController";
-import { checkSearchParams } from "../../middleware/checks";
 
 import { Get, Post, Api } from '../../decorators';
 
@@ -11,7 +10,9 @@ export default class Search {
   constructor() { }
 
   @Get({
-    middlewares: checkSearchParams
+    query: {
+      'q': 'string'
+    }
   })
   async get({ query }: Request, res: Response) {
     const result = await getPlacesByName(query.q);
