@@ -1,4 +1,6 @@
-import { Router, Request, Response, NextFunction } from "express";
+import 'reflect-metadata';
+import { Router } from "express";
+import { ROUTE_METADATA, PATH_METADATA } from '../decorators/utils/constant';
 
 type Wrapper = ((router: Router) => void);
 
@@ -11,21 +13,14 @@ export const applyMiddleware = (
   }
 };
 
-type Handler = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => Promise<void> | void;
-
-type Route = {
-  path: string;
-  method: string;
-  handler: Handler | Handler[];
-};
-
-export const applyRoutes = (routes: Route[], router: Router) => {
-  for (const route of routes) {
-    const { method, path, handler } = route;
-    (router as any)[method](path, handler);
+export const applyRoutes = (controllers: any, router: Router) => {
+  for (const controller of controllers) {
+    const routes = Reflect.getMetadata(ROUTE_METADATA, controller);
+    const controllerPath = Reflect.getMetadata(PATH_METADATA, controller);
+    for (const route of routes) {
+      const { method, path, handler } = route;
+      const pth = `/${controllerPath}${path}`;
+      (router as any)[method](pth, handler);
+    }
   }
 };
